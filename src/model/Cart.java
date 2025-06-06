@@ -94,6 +94,7 @@ public class Cart {
      * 
      * @param product The product to add to the cart
      * @param quantity the desired quantity of the product
+     * @throws IllegalArgumentException If the quantity is < 0
      */
     public void addItem(Product product, int quantity ) {
         // throw an exception if the quantity entered by the user is invalid (<=0)
@@ -143,6 +144,7 @@ public class Cart {
      * 
      * @param targetId The ID of the product to update
      * @param quantity The new quantity to set
+     * @throws IllegalArgumentException If the quantity is < 0
      */
     public void updateQuantity(int targetId, int quantity) {
         if (quantity <=  0) {

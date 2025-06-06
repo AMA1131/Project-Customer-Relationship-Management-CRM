@@ -21,13 +21,14 @@ public class CartProduct {
 
     /**
      * Constructs a cart product with the product and the quantity desired by the user.
+     * Use setter to validate quantity input
      * 
      * @param product The product to add to the cart
      * @param quantity the wanted quantity of the product to add to the cart 
      */
     public CartProduct(Product product, int quantity) {
         this.product = product;
-        this.quantity = quantity;
+        this.setQuantity(quantity);
     }
 
     // ==============================================================================================================
