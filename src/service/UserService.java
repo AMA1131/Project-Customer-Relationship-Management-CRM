@@ -2,17 +2,15 @@ package service;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import factory.UserFactory;
+import factory.User;
 import model.GenerictIterator;
-import model.User;
-import utils.ClientFileHandler;
 import utils.PasswordHasher;
 import utils.UserFileHandler;
-import utils.Logger;
+import utils.LogHandler;
 
 public class UserService {
     private static UserService uniqueInstance = null;
-    private final ArrayList<User> users;
+    private final ArrayList<model.User> users;
 
     private UserService() throws  IOException{
         this.users = UserFileHandler.loadUsers();
@@ -23,7 +21,7 @@ public class UserService {
             try{
                 uniqueInstance = new UserService();
             } catch(IOException e) {
-                Logger.log("From Userservice instanciation, an error occured during the reading the user file: " + e.getMessage());
+                LogHandler.logError("From Userservice instanciation, an error occured during the reading the user file: " + e.getMessage());
                 throw new RuntimeException("Critical IO error, please contact Admin", e);
             }
         }
@@ -32,9 +30,9 @@ public class UserService {
 
     public void addUser(String firstName, String lastName, String email, String role, String password) throws IOException{
         // create the factory
-        UserFactory userFactory = new UserFactory();
+        User userFactory = new User();
         // create the user
-        User user = (User) userFactory.createEntity(firstName, lastName, email, role, password);
+        model.User user = (model.User) userFactory.createEntity(firstName, lastName, email, role, password);
         // Add user to the local user storage
         users.add(user);
         // Add user to the database
@@ -42,19 +40,19 @@ public class UserService {
             try{
                 UserFileHandler.addToDb(user);
             } catch (IOException e) {
-                Logger.log("IO error during saving to database: " + e.getMessage());
+                LogHandler.logError("IO error during saving to database: " + e.getMessage());
                 System.err.println("❌ An error occured during saving");
             }
         }).start();
 
         // notify adding state in the log file
-        Logger.log("User added" + user);
+        LogHandler.logInfo("User added" + user);
     }
 
     public boolean removeUser (int targetId) throws IOException {
-        GenerictIterator<User> iterator = new GenerictIterator<>(users);
+        GenerictIterator<model.User> iterator = new GenerictIterator<>(users);
         while (iterator.hasNext()) {
-            User user = iterator.next(); 
+            model.User user = iterator.next();
             int id = user.getId();
             if (id == targetId) {
                 iterator.remove();
@@ -62,36 +60,36 @@ public class UserService {
                     try{
                         UserFileHandler.saveUsers(users);
                     } catch (IOException e) {
-                        Logger.log("IO error during saving to database: " + e.getMessage());
+                        LogHandler.logError("IO error during saving to database: " + e.getMessage());
                         System.err.println("❌ An error occured during saving");
                     }
                 }).start();
 
-                Logger.log("User deleted" + user);
+                LogHandler.logInfo("User deleted");
                 return true;
             }
         }
-        Logger.log("Id to remove not found in database");
+        LogHandler.logInfo("Id to remove not found in database");
         return false;
     }
 
-    public ArrayList<User> getusers() {
+    public ArrayList<model.User> getusers() {
         return users;
     }
 
-    public User aunticateUser(String email, String password) {
+    public model.User aunticateUser(String email, String password) {
         String hashedpassword = PasswordHasher.hash(password);
         if (users.isEmpty()) return null;
-        for(User u : users) {
+        for(model.User u : users) {
             if ((u.getEmail().equals(email)) && (u.getHashedPassword().equals(hashedpassword))) return u;
         }
 
         return null;
     }
 
-    public ArrayList<User> findUserByName(String firstName) {
-        ArrayList<User> result = new ArrayList<>();
-        for(User user : users) {
+    public ArrayList<model.User> findUserByName(String firstName) {
+        ArrayList<model.User> result = new ArrayList<>();
+        for(model.User user : users) {
             if (user.getFirstName().equals(firstName.trim().toLowerCase().replaceAll("\\s+", " "))) {
                 result.add(user);
             }

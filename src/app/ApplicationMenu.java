@@ -6,7 +6,7 @@ import model.composite_interaction.Interaction;
 import service.ClientService;
 import service.InteractionService;
 import service.UserService;
-import utils.Logger;
+import utils.LogHandler;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -30,7 +30,7 @@ public class ApplicationMenu {
             interactionService = InteractionService.getUniqueInstance();
         } catch (RuntimeException e) {
             System.err.println("❌ Application Starting failed: Please contact Support.");
-            Logger.log("App Stop : " + e.getMessage());
+            LogHandler.logError("App Stop : " + e.getMessage());
             System.exit(1);
         }
         while (true) {
@@ -71,7 +71,7 @@ public class ApplicationMenu {
                 userMenu();
             }
         } else{
-            System.out.println("❌ Incorrect identifiers. Please retry");
+            System.err.println("❌ Incorrect identifiers. Please retry");
         }
     }
 
@@ -79,31 +79,31 @@ public class ApplicationMenu {
         Path filePath = Paths.get("data/users.json");
         String role;
         try {
-            System.out.print("Prénom : ");
+            System.out.print("Firstname : ");
             String firstName = scan.nextLine();
-            System.out.print("Nom : ");
+            System.out.print("Lastname : ");
             String lastName = scan.nextLine();
             System.out.print("Email : ");
             String email = scan.nextLine();
             if (!Files.exists(filePath)) {
                 role = "admin";
             } else {
-                System.out.print("Rôle (admin/user) : ");
+                System.out.print("Role (admin/user) : ");
                 role = scan.nextLine();
             }
             System.out.print("Password : ");
             String password = scan.nextLine();
 
             userService.addUser(firstName, lastName, email, role, password);
-            System.out.println("✅ Utilisateur créé");
+            System.out.println("✅ User created");
         } catch (IllegalArgumentException e) {
-            Logger.log("Illegal argument: " + e.getMessage());
+            LogHandler.logWarning("Illegal argument: " + e.getMessage());
             System.err.println("Illegal argument: " + e.getMessage());
         } catch(IOException e) {
-            Logger.log("From addToDB, an error occured during the reading process: " + e.getMessage());
-
+            LogHandler.logError("From addToDB, an error occured during the reading process: " + e.getMessage());
         } catch (Exception e) {
-            System.out.println("❌ Erreur : " + e.getMessage());
+            LogHandler.logError("An error occured creation: " + e.getMessage());
+            System.out.println("❌ Error : " + e.getMessage());
         }
     }
     public static void removeUserInterface() {
@@ -118,10 +118,10 @@ public class ApplicationMenu {
                 System.out.println("❌ Id not found in database");
             }
         } catch (IOException e) {
-            Logger.log("An error occured while saving." + e.getMessage());
+            LogHandler.logError("An error occured while saving." + e.getMessage());
             System.err.println("❌ Operation Failed: IO Error");
         } catch (Exception e) {
-            Logger.log("An error occured during the interaction removal: " + e);
+            LogHandler.logError("An error occured during the interaction removal: " + e);
             System.err.println("❌ An Error occured: Operation Failed");
         }
     }
@@ -155,13 +155,13 @@ public class ApplicationMenu {
             clientService.addClient(firstName, lastName, email, phone, company);
             System.out.println("✅ Client created.");
         } catch (IllegalArgumentException e) {
-            Logger.log("Arguments Error" + e);
+            LogHandler.logWarning("Arguments Error" + e);
             System.err.println("❌" + e.getMessage() +" Please retry");
         } catch (RuntimeException e) {
-            Logger.log("From addToDB, an error occured during the saving process: " + e.getMessage());
+            LogHandler.logError("From addToDB, an error occured during the saving process: " + e.getMessage());
             System.out.println("Operation failed: I/O issues Contact Support.");
         } catch (Exception e) {
-            Logger.log("An issue occured during the process" + e.getMessage());
+            LogHandler.logError("An issue occured during the process" + e.getMessage());
             System.out.println("Operation failed: An error occured during process");
         }
     }
@@ -177,10 +177,10 @@ public class ApplicationMenu {
                 System.out.println("❌ Id not found in database");
             }
         } catch (IOException e) {
-            Logger.log("An error occured while saving." + e.getMessage());
+            LogHandler.logError("An error occured while saving." + e.getMessage());
             System.err.println("❌ Operation Failed: IO Error");
         } catch (Exception e) {
-            Logger.log("An error occured during the interaction removal: " + e);
+            LogHandler.logError("An error occured during the interaction removal: " + e.getMessage());
             System.err.println("❌ An Error occured: Operation Failed");
         }
     }
@@ -212,13 +212,13 @@ public class ApplicationMenu {
             interactionService.addInteractionToSubHistory(type, userId, clientId, desc);
             System.out.println("✅ Interaction created.");
         } catch (IOException e) {
-            Logger.log("From addToDB, an error occured during the reading process: " + e.getMessage());
+            LogHandler.logError("From addToDB, an error occured during the reading process: " + e.getMessage());
             System.err.println("❌ Operation Failed: IO issue, please contact support");
         } catch (IllegalArgumentException e) {
-            Logger.log("Arguments Error" + e.getMessage());
+            LogHandler.logWarning("Arguments Error" + e.getMessage());
             System.err.println("❌ Operation failed: " + e.getMessage());
         } catch (Exception e) {
-            Logger.log("An error occured during the interaction add process: " + e.getMessage());
+            LogHandler.logError("An error occured during the interaction add process: " + e.getMessage());
             System.err.println("Operation failed:  please contact support");
         }
     }
@@ -234,10 +234,10 @@ public class ApplicationMenu {
                     System.out.println("❌ Id not found in database");
                 }
             } catch (IOException e) {
-                Logger.log("An error occured while saving." + e.getMessage());
+                LogHandler.logError("An error occured while saving." + e.getMessage());
                 System.err.println("❌ Operation Failed: IO Error");
             } catch (Exception e) {
-                Logger.log("An error occured during the interaction removal: " + e.getMessage());
+                LogHandler.logError("An error occured during the interaction removal: " + e.getMessage());
                 System.err.println("❌ An Error occured: Operation Failed");
             }
     }
@@ -278,7 +278,7 @@ public class ApplicationMenu {
             interactionService.updateInteractionDescription(id, newDescription);
             System.out.println("✅ Interaction updated");
         } catch (IOException e) {
-            Logger.log("An error occured during the interaction update: " + e.getMessage());
+            LogHandler.logError("An error occured during the interaction update: " + e.getMessage());
             System.err.println("❌ IO Issue, an Error occured during the saving: Please contact support");
         }
     }

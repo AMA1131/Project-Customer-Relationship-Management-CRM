@@ -1,25 +1,21 @@
 package factory;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import model.Client;
 import model.Entity;
-import model.User;
-import service.ClientService;
 import service.UserService;
 import utils.InputValidator;
 import utils.PasswordHasher;
 
-public class UserFactory  extends AbstractEntityFactory{
+public class User extends AbstractEntity {
     private static final AtomicInteger idCounter = new AtomicInteger(initIdCounter());
 
     private static int initIdCounter() {
         int maxId = 0;
-        ArrayList<User> users = UserService.getUniqueInstance().getusers();
+        ArrayList<model.User> users = UserService.getUniqueInstance().getusers();
         if (!users.isEmpty()) {
-            for (User u : users) {
+            for (model.User u : users) {
                 if (u.getId() > maxId) {
                     maxId = u.getId();
                 }
@@ -58,7 +54,7 @@ public class UserFactory  extends AbstractEntityFactory{
             throw new IllegalArgumentException ("Use 'admin' or 'user'");
         }
 
-        return new User(idCounter.getAndIncrement(), firstName, lastName, email, role, hashedPassword);
+        return new model.User(idCounter.getAndIncrement(), firstName, lastName, email, role, hashedPassword);
 
     }
 }

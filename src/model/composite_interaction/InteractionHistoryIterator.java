@@ -6,7 +6,7 @@ import java.util.NoSuchElementException;
 import java.util.Queue;
 
 public class InteractionHistoryIterator implements Iterator<Interaction> {
-    private Queue<Interaction> queue = new LinkedList<>();
+    private final Queue<Interaction> queue = new LinkedList<>();
 
     public InteractionHistoryIterator(InteractionHistory root) {
         align(root);

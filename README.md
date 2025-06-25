@@ -11,13 +11,13 @@ This project is about customer management.
 | File Storage        | Java IO                                        | To keep traceability across program executions                          |
 | Collections         | ArrayList                                      | To store and manipulate entities (user, interactions etc...)            |
 | Singleton Pattern   | in services (e.g ClientService                 | To guarantee a single access point to the services                      |
-| Factory Pattern     | Entity creation (e.g user, client etc...)      | To separate responsabilities, define and centralize object creation     |
+| Factory Pattern     | Entity creation (e.g user, client etc...)      | To separate responsibilities, define and centralize object creation     |
 | Composite Pattern   | Interactions hierarchies                       | To unify display method behaviour of interaction interaction components |
 | Iterator Pattern    | Generic iterator & InteractionHistoryIterator  | To iterate and remove element from collection                           |
 | Exception Shielding | try/catch + Logger                             | To avoid crash and hide stack traces                                    |
 | Logging             | Custom Logger.java                             | To save precisely a record of technical errors and internal events      |
 | Multithreading      | Used during file updating (new Tread + lambda) | To save data asynchronously without blocking user experience            |
-| Lambda Expressions  | Runnable lamda for multithreading              | To support multithreading                                               |
+| Lambda Expressions  | Runnable lambda for multithreading             | To support multithreading                                               |
 
 ## ⚙️ Setup and Execution Instructions
 

@@ -2,11 +2,10 @@ package service;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import factory.InteractionHistoryFactory;
+import factory.InteractionHistory;
 import model.GenerictIterator;
-import model.composite_interaction.InteractionHistory;
 import utils.InteractionHistoryFileHandler;
-import utils.Logger;
+import utils.LogHandler;
 
 /**
  * Singleton pattern
@@ -15,7 +14,7 @@ public class InteractionHistoryService {
     //unique instance
     private static InteractionHistoryService instance = null;
 
-    private final ArrayList<InteractionHistory> interactionHistories;
+    private final ArrayList<model.composite_interaction.InteractionHistory> interactionHistories;
 
     // private constructor
     private InteractionHistoryService() throws  IOException{
@@ -27,7 +26,7 @@ public class InteractionHistoryService {
             try{
                 instance = new InteractionHistoryService();
             } catch (IOException e) {
-                Logger.log("From InteractionHistoryService instanciation, An error occured during the reading Interaction history file: " + e.getMessage());
+                LogHandler.logError("From InteractionHistoryService instanciation, An error occured during the reading Interaction history file: " + e.getMessage());
                 throw new RuntimeException("Critical IO error, please contact Admin", e);
             }
         }
@@ -36,13 +35,13 @@ public class InteractionHistoryService {
     }
 
     public boolean isexisting(int clientId) {
-        for (InteractionHistory interactionHistory : interactionHistories) {
+        for (model.composite_interaction.InteractionHistory interactionHistory : interactionHistories) {
             if (interactionHistory.getClientId() == clientId) return true;
         }
         return false;
     }
 
-    public ArrayList<InteractionHistory> getInteractionshistories() {
+    public ArrayList<model.composite_interaction.InteractionHistory> getInteractionshistories() {
         return interactionHistories;
     }
 
@@ -53,41 +52,41 @@ public class InteractionHistoryService {
     public void createInteractionHistory(String title, int clientId) throws IOException{
         // Check if an interaction history already exists for this client
         if (isexisting(clientId)) {
-            Logger.log("An interaction History already exists for this client");
+            LogHandler.logDebug("An interaction History already exists for this client");
                 return;
         }
 
         // At this point, it means interation history doesn't exists for this client so we create a new one.
-        InteractionHistoryFactory interactionHistoryFactory = new InteractionHistoryFactory();
-        InteractionHistory rootInteractionHistory = (InteractionHistory) interactionHistoryFactory.createEntity(title, clientId);
+        InteractionHistory interactionHistoryFactory = new InteractionHistory();
+        model.composite_interaction.InteractionHistory rootInteractionHistory = (model.composite_interaction.InteractionHistory) interactionHistoryFactory.createEntity(title, clientId);
 
         // Create 3 sub-history by default for the 3 types of interactions: meeting, mail & phone
-        InteractionHistory callHistory = (InteractionHistory) interactionHistoryFactory.createEntity("Call", clientId);
-        InteractionHistory meetingHistory = (InteractionHistory) interactionHistoryFactory.createEntity("Meeting", clientId);
-        InteractionHistory emailHistory = (InteractionHistory) interactionHistoryFactory.createEntity("Email", clientId);
+        model.composite_interaction.InteractionHistory callHistory = (model.composite_interaction.InteractionHistory) interactionHistoryFactory.createEntity("Call", clientId);
+        model.composite_interaction.InteractionHistory meetingHistory = (model.composite_interaction.InteractionHistory) interactionHistoryFactory.createEntity("Meeting", clientId);
+        model.composite_interaction.InteractionHistory emailHistory = (model.composite_interaction.InteractionHistory) interactionHistoryFactory.createEntity("Email", clientId);
         //Add subhistories to root
         rootInteractionHistory.addInteraction(callHistory);
         rootInteractionHistory.addInteraction(meetingHistory);
         rootInteractionHistory.addInteraction(emailHistory);
         // udapte the list of interaction histories
         interactionHistories.add(rootInteractionHistory);
-        Logger.log("nombre d'element dans l'historique" + interactionHistories.size());
+        LogHandler.logDebug("number of elements in history" + interactionHistories.size());
         //Add the new root history to file
         new Thread(() -> {
             try{
                 InteractionHistoryFileHandler.addToDb(rootInteractionHistory);
-                Logger.log(" InteractionHistory created with wub-histories for the client " + clientId);
+                LogHandler.logDebug(" InteractionHistory created with wub-histories for the client " + clientId);
             } catch (IOException e) {
-                Logger.log("IO error during client saving to database: " + e.getMessage());
+                LogHandler.logError("IO error during client saving to database: " + e.getMessage());
                 System.err.println("❌ An error occured during client saving");
             }
         }).start();
     }
 
     public void removeInteractionHistory(int targetId) throws IOException{
-        GenerictIterator<InteractionHistory> iterator = new GenerictIterator<>(interactionHistories);
+        GenerictIterator<model.composite_interaction.InteractionHistory> iterator = new GenerictIterator<>(interactionHistories);
         while (iterator.hasNext()) {
-            InteractionHistory history = iterator.next();
+            model.composite_interaction.InteractionHistory history = iterator.next();
             int id = history.getClientId();
             if (id == targetId) {
                 try {
@@ -97,13 +96,13 @@ public class InteractionHistoryService {
                         try{
                             InteractionHistoryFileHandler.saveInteractionHistories(interactionHistories);
                         } catch (IOException e) {
-                            Logger.log("IO error during client saving to database: " + e.getMessage());
+                            LogHandler.logError("IO error during client saving to database: " + e.getMessage());
                             System.err.println("❌ An error occured during client saving");
                         }
                     }).start();
 
                 } catch (IllegalStateException e) {
-                    Logger.log("Error:" + e);
+                    LogHandler.logWarning("Error:" + e);
                 }
             }
         }
@@ -115,15 +114,15 @@ public class InteractionHistoryService {
             try{
                 InteractionHistoryFileHandler.saveInteractionHistories(interactionHistories);
             } catch (IOException e) {
-                Logger.log("IO error during client saving to database: " + e.getMessage());
+                LogHandler.logError("IO error during client saving to database: " + e.getMessage());
                 System.err.println("❌ An error occured during client saving");
             }
         }).start();
 
     }
 
-    public InteractionHistory getInteractionshistoryById(int clientId) {
-        for (InteractionHistory interactionHistory : interactionHistories) {
+    public model.composite_interaction.InteractionHistory getInteractionshistoryById(int clientId) {
+        for (model.composite_interaction.InteractionHistory interactionHistory : interactionHistories) {
             if (interactionHistory.getClientId() == clientId) {
                 return interactionHistory;
             }

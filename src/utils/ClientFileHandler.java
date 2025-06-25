@@ -26,7 +26,7 @@ public class ClientFileHandler {
 
             if (clients == null) clients = new ArrayList<>();
         } catch (FileNotFoundException e) {
-            Logger.log("File not found : " + e.getMessage());
+            LogHandler.logWarning("File not found : " + e.getMessage());
         }
         return  clients;
     }
@@ -34,9 +34,7 @@ public class ClientFileHandler {
     public static void saveClients(ArrayList<Client> clients) throws IOException{
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
             gson.toJson(clients, writer);
-        } /*catch (IOException e) {
-            Logger.log("Error while saving client file: " + e.getMessage());
-        }*/
+        }
     }
 
     public static void addToDb(Client newClient) throws IOException{

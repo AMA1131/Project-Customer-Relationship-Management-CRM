@@ -1,0 +1,40 @@
+[
+  {
+    "id": 1,
+    "title": "history for client #1",
+    "interactions": [
+      {
+        "kind": "InteractionHistory",
+        "id": 2,
+        "title": "call",
+        "interactions": [
+          {
+            "kind": "Interaction",
+            "id": 1,
+            "type": "call",
+            "userId": 1,
+            "description": "about the robot",
+            "interactionDate": "2025-06-25T13:02:55.8074345",
+            "clientId": 1
+          }
+        ],
+        "clientId": 1
+      },
+      {
+        "kind": "InteractionHistory",
+        "id": 3,
+        "title": "meeting",
+        "interactions": [],
+        "clientId": 1
+      },
+      {
+        "kind": "InteractionHistory",
+        "id": 4,
+        "title": "email",
+        "interactions": [],
+        "clientId": 1
+      }
+    ],
+    "clientId": 1
+  }
+]

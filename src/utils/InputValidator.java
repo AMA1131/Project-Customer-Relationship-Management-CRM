@@ -1,5 +1,7 @@
 package utils;
 
+/*org.apache.commons.text.StringEscapeUtils;*/
+
 public class InputValidator {
 
     public static boolean isValidEmail(String email) {
@@ -12,7 +14,7 @@ public class InputValidator {
     }
 
     public static boolean isValidNumber(String phoneNumber) {
-        if (phoneNumber == null || phoneNumber.length() == 0) return false;
+        if (phoneNumber == null || phoneNumber.isEmpty()) return false;
         // Sanitization
         phoneNumber = phoneNumber.trim().replaceAll("\\s+", "");
         String phoneNumberRegex = "^\\+?[0-9]{7,15}$";
@@ -21,7 +23,7 @@ public class InputValidator {
     }
 
     public static boolean isValidName(String name) {
-        if (name == null || name.length() == 0) return false;
+        if (name == null || name.isEmpty()) return false;
         // Sanitization
         name = name.trim().replaceAll("\\s+", " ").toLowerCase();
         String nameRegex = "^(?!.*[-.'\\s]{2})[\\p{L}'.\\-\\s]{2,50}$";

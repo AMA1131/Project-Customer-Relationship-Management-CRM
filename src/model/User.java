@@ -1,12 +1,12 @@
 package model;
 
 public class User implements Entity{
-    private int id;
-    private String firstName;
-    private String lastName;
-    private String email;
-    private String role; //admin or user
-    private String hashedPassword;
+    private final int id;
+    private final String firstName;
+    private final String lastName;
+    private final String email;
+    private final String role; //admin or user
+    private final String hashedPassword;
 
 //==============================================================================================
 
@@ -39,8 +39,8 @@ public class User implements Entity{
         return role;
     }
     public String getHashedPassword() { return hashedPassword; }
-    
-//==============================================================================================    
+
+//==============================================================================================
 
     @Override
     public String toString() {

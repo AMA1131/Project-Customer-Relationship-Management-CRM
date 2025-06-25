@@ -3,18 +3,17 @@ package factory;
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 import model.Entity;
-import model.composite_interaction.InteractionHistory;
 import service.InteractionHistoryService;
-import utils.Logger;
+import utils.LogHandler;
 
-public class InteractionHistoryFactory extends AbstractEntityFactory{
+public class InteractionHistory extends AbstractEntity {
     private static final AtomicInteger idCounter = new AtomicInteger(initIdCounter());
 
     private static int initIdCounter() {
         int maxId = 0;
-        ArrayList<InteractionHistory> interactionHistories = InteractionHistoryService.getInstance().getInteractionshistories();
+        ArrayList<model.composite_interaction.InteractionHistory> interactionHistories = InteractionHistoryService.getInstance().getInteractionshistories();
         if (!interactionHistories.isEmpty()) {
-            for (InteractionHistory ih : interactionHistories) {
+            for (model.composite_interaction.InteractionHistory ih : interactionHistories) {
                 if (ih.getId() > maxId) {
                     maxId = ih.getId();
                 }
@@ -37,7 +36,7 @@ public class InteractionHistoryFactory extends AbstractEntityFactory{
         if (clientId < 1) {
             throw new IllegalArgumentException("Client ID must be positive integers");
         }
-        Logger.log("Created Interaction history " + title);
-        return new InteractionHistory(idCounter.getAndIncrement(), title, clientId);
+        LogHandler.logInfo("Created Interaction history " + title);
+        return new model.composite_interaction.InteractionHistory(idCounter.getAndIncrement(), title, clientId);
     }
 }

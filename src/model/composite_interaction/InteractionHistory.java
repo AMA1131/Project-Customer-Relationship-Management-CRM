@@ -3,7 +3,7 @@ package model.composite_interaction;
 import java.util.ArrayList;
 
 import model.Entity;
-import utils.Logger;
+import utils.LogHandler;
 
 public class InteractionHistory implements Entity, InteractionComponent { 
     private int id;
@@ -23,7 +23,7 @@ public class InteractionHistory implements Entity, InteractionComponent {
 
     public void addInteraction(InteractionComponent interaction) {
         if (interaction == null){
-            Logger.log("Attempted to add null interaction to history.");
+            LogHandler.logError("Attempted to add null interaction to history.");
             return;
         }
         interactions.add(interaction);

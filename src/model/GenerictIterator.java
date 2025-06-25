@@ -5,7 +5,7 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 public class GenerictIterator<T> implements Iterator<T>{
-    private ArrayList<T> entities;
+    private final ArrayList<T> entities;
     private int index = 0;
 
     /**

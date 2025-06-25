@@ -3,18 +3,17 @@ package factory;
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 import model.Entity;
-import model.composite_interaction.Interaction;
 import service.InteractionService;
 
-public class InteractionFactory extends AbstractEntityFactory {
+public class Interaction extends AbstractEntity {
     
     private static final AtomicInteger idcounter = new AtomicInteger(initIdCounter());
 
     private static int initIdCounter() {
         int maxId = 0;
-        ArrayList<Interaction> interactions = InteractionService.getUniqueInstance().getInteractions();
+        ArrayList<model.composite_interaction.Interaction> interactions = InteractionService.getUniqueInstance().getInteractions();
         if (!interactions.isEmpty()) {
-            for (Interaction i : interactions) {
+            for (model.composite_interaction.Interaction i : interactions) {
                 if (i.getId() > maxId) {
                     maxId = i.getId();
                 }
@@ -41,6 +40,6 @@ public class InteractionFactory extends AbstractEntityFactory {
             throw new IllegalArgumentException("User ID and Client ID must be positive integers");
         }
 
-        return new Interaction(idcounter.getAndIncrement(), type, userId, description, clientId);
+        return new model.composite_interaction.Interaction(idcounter.getAndIncrement(), type, userId, description, clientId);
     }
 }

@@ -1,26 +1,21 @@
 package factory;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import model.Entity;
-import model.Client;
-import model.composite_interaction.Interaction;
 import service.ClientService;
-import service.InteractionService;
 import utils.InputValidator;
-import utils.Logger;
 
-public class ClientFactory extends AbstractEntityFactory{
+public class Client extends AbstractEntity {
     
     private static final AtomicInteger idCounter = new AtomicInteger(initIdCounter());
 
     private static int initIdCounter() {
         int maxId = 0;
-            ArrayList<Client> clients = ClientService.getUniqueInstance().getClients();
+            ArrayList<model.Client> clients = ClientService.getUniqueInstance().getClients();
             if (!clients.isEmpty()) {
-                for (Client c : clients) {
+                for (model.Client c : clients) {
                     if (c.getId() > maxId) {
                         maxId = c.getId();
                     }
@@ -54,7 +49,7 @@ public class ClientFactory extends AbstractEntityFactory{
             throw new IllegalArgumentException ("Invalid phone number format");
         }
 
-        return new Client(idCounter.getAndIncrement(), firstName, lastName, email, phoneNumber, (!company.isEmpty() ? company : "None"));
+        return new model.Client(idCounter.getAndIncrement(), firstName, lastName, email, phoneNumber, (!company.isEmpty() ? company : "None"));
 
     }
 }

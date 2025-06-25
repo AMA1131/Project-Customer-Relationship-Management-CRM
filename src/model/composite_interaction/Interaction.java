@@ -6,12 +6,12 @@ import java.time.format.DateTimeFormatter;
 import model.Entity;
 
 public class Interaction implements Entity, InteractionComponent {
-    private int id;
-    private String type;
-    private int userId;
+    private final int id;
+    private final String type;
+    private final int userId;
     private String description;
-    private String interactionDate;
-    private int clientId;
+    private final String interactionDate;
+    private final int clientId;
     private static final DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 
 //==============================================================================================================

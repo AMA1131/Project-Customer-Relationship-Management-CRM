@@ -8,7 +8,7 @@ import service.InteractionService;
 import org.junit.Before;
 import org.junit.Test;
 import model.composite_interaction.Interaction;
-import utils.Logger;
+import utils.LogHandler;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -111,7 +111,7 @@ public class InteractionServiceTest {
             assertEquals(9, interactions.size());
             return;
         } catch (IOException e){
-            Logger.log("IO Error while saving interaction history file: " + e.getMessage());
+            LogHandler.logError("IO Error while saving interaction history file: " + e.getMessage());
         }
 
 
@@ -156,7 +156,7 @@ public class InteractionServiceTest {
             assertEquals(1, matchingsubhistory.getInteractions().size());
             assertNull(instance1.getInteractionById(7));
         } catch (IOException e){
-            Logger.log("IO Error while saving interaction history file: " + e.getMessage());
+            LogHandler.logError("IO Error while saving interaction history file: " + e.getMessage());
         }
     }
 }

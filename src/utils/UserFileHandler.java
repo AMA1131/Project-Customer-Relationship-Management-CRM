@@ -26,7 +26,7 @@ public class UserFileHandler {
             if (users == null) users = new ArrayList<>();
 
         } catch (FileNotFoundException e) {
-            Logger.log("FIle not found." + e);
+            LogHandler.logWarning("FIle not found." + e);
             /*return users*/;
         }
 
