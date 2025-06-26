@@ -4,12 +4,14 @@ import java.io.IOException;
 import java.util.ArrayList;
 import factory.User;
 import model.GenerictIterator;
+import utils.ClientFileHandler;
 import utils.PasswordHasher;
 import utils.UserFileHandler;
 import utils.LogHandler;
 
 public class UserService {
     private static UserService uniqueInstance = null;
+    public static boolean isTesting = false;
     private final ArrayList<model.User> users;
 
     private UserService() throws  IOException{
@@ -28,6 +30,15 @@ public class UserService {
         return uniqueInstance;
     }
 
+    public boolean doesUserExist(int  userId) {
+        for (model.User u : users) {
+            if (u.getId() == userId) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public void addUser(String firstName, String lastName, String email, String role, String password) throws IOException{
         // create the factory
         User userFactory = new User();
@@ -36,14 +47,18 @@ public class UserService {
         // Add user to the local user storage
         users.add(user);
         // Add user to the database
-        new Thread(() -> {
-            try{
+        if(isTesting) {
                 UserFileHandler.addToDb(user);
-            } catch (IOException e) {
-                LogHandler.logError("IO error during saving to database: " + e.getMessage());
-                System.err.println("❌ An error occured during saving");
-            }
-        }).start();
+        } else{
+            new Thread(() -> {
+                try{
+                    UserFileHandler.addToDb(user);
+                } catch (IOException e) {
+                    LogHandler.logError("IO error during saving to database: " + e.getMessage());
+                    System.err.println("❌ An error occured during saving");
+                }
+            }).start();
+        }
 
         // notify adding state in the log file
         LogHandler.logInfo("User added" + user);
@@ -56,26 +71,35 @@ public class UserService {
             int id = user.getId();
             if (id == targetId) {
                 iterator.remove();
-                new Thread(() -> {
-                    try{
-                        UserFileHandler.saveUsers(users);
-                    } catch (IOException e) {
-                        LogHandler.logError("IO error during saving to database: " + e.getMessage());
-                        System.err.println("❌ An error occured during saving");
-                    }
-                }).start();
+                if (isTesting) {
+                    UserFileHandler.saveUsers(users);
+                } else {
+                    new Thread(() -> {
+                        try{
+                            UserFileHandler.saveUsers(users);
+                        } catch (IOException e) {
+                            LogHandler.logError("IO error during client saving to database: " + e.getMessage());
+                            System.err.println("❌ An error occured during client saving");
+                        }
+                    }).start();
+                }
 
-                LogHandler.logInfo("User deleted");
+                LogHandler.logInfo("Client deleted" + user);
                 return true;
             }
         }
-        LogHandler.logInfo("Id to remove not found in database");
+        LogHandler.logInfo("Id not found in database");
         return false;
     }
 
     public ArrayList<model.User> getusers() {
         return users;
     }
+
+    public boolean getIsTesting() {
+        return isTesting;
+    }
+
 
     public model.User aunticateUser(String email, String password) {
         String hashedpassword = PasswordHasher.hash(password);

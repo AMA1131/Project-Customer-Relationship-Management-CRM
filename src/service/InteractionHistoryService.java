@@ -13,7 +13,7 @@ import utils.LogHandler;
 public class InteractionHistoryService {
     //unique instance
     private static InteractionHistoryService instance = null;
-
+    public static boolean isTesting = false;
     private final ArrayList<model.composite_interaction.InteractionHistory> interactionHistories;
 
     // private constructor
@@ -70,9 +70,10 @@ public class InteractionHistoryService {
         rootInteractionHistory.addInteraction(emailHistory);
         // udapte the list of interaction histories
         interactionHistories.add(rootInteractionHistory);
-        LogHandler.logDebug("number of elements in history" + interactionHistories.size());
+        LogHandler.logDebug("number of elements in history: " + interactionHistories.size() + ". number of subhistories: " + rootInteractionHistory.getInteractions().size());
+
         //Add the new root history to file
-        new Thread(() -> {
+        if(isTesting) {
             try{
                 InteractionHistoryFileHandler.addToDb(rootInteractionHistory);
                 LogHandler.logDebug(" InteractionHistory created with wub-histories for the client " + clientId);
@@ -80,7 +81,17 @@ public class InteractionHistoryService {
                 LogHandler.logError("IO error during client saving to database: " + e.getMessage());
                 System.err.println("❌ An error occured during client saving");
             }
-        }).start();
+        } else{
+            new Thread(() -> {
+                try{
+                    InteractionHistoryFileHandler.addToDb(rootInteractionHistory);
+                    LogHandler.logDebug(" InteractionHistory created with wub-histories for the client " + clientId);
+                } catch (IOException e) {
+                    LogHandler.logError("IO error during client saving to database: " + e.getMessage());
+                    System.err.println("❌ An error occured during client saving");
+                }
+            }).start();
+        }
     }
 
     public void removeInteractionHistory(int targetId) throws IOException{
@@ -91,16 +102,23 @@ public class InteractionHistoryService {
             if (id == targetId) {
                 try {
                     iterator.remove();
-
-                    new Thread(() -> {
+                    if(isTesting) {
                         try{
                             InteractionHistoryFileHandler.saveInteractionHistories(interactionHistories);
                         } catch (IOException e) {
                             LogHandler.logError("IO error during client saving to database: " + e.getMessage());
                             System.err.println("❌ An error occured during client saving");
                         }
-                    }).start();
-
+                    } else {
+                        new Thread(() -> {
+                            try{
+                                InteractionHistoryFileHandler.saveInteractionHistories(interactionHistories);
+                            } catch (IOException e) {
+                                LogHandler.logError("IO error during client saving to database: " + e.getMessage());
+                                System.err.println("❌ An error occured during client saving");
+                            }
+                        }).start();
+                    }
                 } catch (IllegalStateException e) {
                     LogHandler.logWarning("Error:" + e);
                 }
@@ -127,7 +145,7 @@ public class InteractionHistoryService {
                 return interactionHistory;
             }
         }
-        /*Logger.log("No interaction history found for client ID: " + clientId);*/
+        LogHandler.logWarning("No interaction history found for client ID: " + clientId);
         return null;
     }
 

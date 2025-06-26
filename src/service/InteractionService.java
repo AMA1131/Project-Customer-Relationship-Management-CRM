@@ -14,6 +14,7 @@ import model.composite_interaction.InteractionHistoryIterator;
 
 public class InteractionService {
     private static InteractionService uniqueInstance = null;
+    public static boolean isTesting = false;
     private final ArrayList<model.composite_interaction.Interaction> interactions;
     private final InteractionHistoryService interactionHistoryService = InteractionHistoryService.getInstance();
     private final ClientService clientservice = ClientService.getUniqueInstance();
@@ -97,7 +98,7 @@ public class InteractionService {
 
     public void addInteractionToSubHistory(String type /*meeting, call, email */, int userId,int clientId, String description) throws IOException {
         type = type.trim().replaceAll("\\s+", "").toLowerCase();
-        if ( !clientservice.doesClientExist(clientId)) {
+        if ( !isTesting && !clientservice.doesClientExist(clientId)) {
             throw new IllegalArgumentException("Client ID does not exist in database. Please create it and retry.");
         }
         //Create factory for interaction
@@ -112,7 +113,7 @@ public class InteractionService {
 
         // Create a new client history if client root is null
         if (clientRoot == null) {
-            /*Logger.log("Client root NULL");*/
+            LogHandler.logWarning("Client root NULL");
             interactionHistoryService.createInteractionHistory("History for client #" + clientId, clientId);
             clientRoot = interactionHistoryService.getInteractionshistoryById(clientId);
         }
@@ -140,7 +141,7 @@ public class InteractionService {
         subHistory.addInteraction(newInteraction);
         LogHandler.logDebug(subHistory.getTitle() + "subhistory updated with the new interaction" + newInteraction);
 
-        new Thread(() -> {
+        if (isTesting) {
             try{
                 InteractionHistoryFileHandler.saveInteractionHistories(interactionHistoryService.getInteractionshistories());
                 LogHandler.logDebug("Saved in file");
@@ -148,7 +149,18 @@ public class InteractionService {
                 LogHandler.logError("IO error during client saving to database: " + e.getMessage());
                 System.err.println("❌ An error occured during client saving");
             }
-        }).start();
+        } else{
+            new Thread(() -> {
+                try{
+                    InteractionHistoryFileHandler.saveInteractionHistories(interactionHistoryService.getInteractionshistories());
+                    LogHandler.logDebug("Saved in file");
+                } catch (IOException e) {
+                    LogHandler.logError("IO error during client saving to database: " + e.getMessage());
+                    System.err.println("❌ An error occured during client saving");
+                }
+            }).start();
+        }
+
 
         interactions.add(newInteraction);
         LogHandler.logDebug("Interaction added in sub-history '" + type.trim().replaceAll("\\s+", "").toLowerCase() + "' of client #" + clientId);
@@ -183,7 +195,7 @@ public class InteractionService {
             }
         }
 
-        new Thread(() -> {
+        if (isTesting) {
             try{
                 InteractionHistoryFileHandler.saveInteractionHistories(interactionHistoryService.getInteractionshistories());
                 LogHandler.logDebug("Saved in file");
@@ -191,7 +203,17 @@ public class InteractionService {
                 LogHandler.logError("IO error during client saving to database: " + e.getMessage());
                 System.err.println("❌ An error occured during client saving");
             }
-        }).start();
+        } else{
+            new Thread(() -> {
+                try{
+                    InteractionHistoryFileHandler.saveInteractionHistories(interactionHistoryService.getInteractionshistories());
+                    LogHandler.logDebug("Saved in file");
+                } catch (IOException e) {
+                    LogHandler.logError("IO error during client saving to database: " + e.getMessage());
+                    System.err.println("❌ An error occured during client saving");
+                }
+            }).start();
+        }
 
         LogHandler.logInfo("Interaction with ID #" + interactionId + " removed and history updated.");
         return true;

@@ -8,7 +8,8 @@ import utils.ClientFileHandler;
 import utils.LogHandler;
 
 public class ClientService {
-    public static ClientService uniqueInstance = null;
+    private static ClientService uniqueInstance = null;
+    public static boolean isTesting = false;
     private final ArrayList<model.Client> clients;
 
     private ClientService()  throws  IOException{
@@ -45,15 +46,24 @@ public class ClientService {
             // Add client to the local clients storage
             clients.add(client);
             // Add client to the database
-            new Thread(() -> {
+            if (isTesting) {
                 try{
                     ClientFileHandler.addToDb(client);
                 } catch (IOException e) {
                     LogHandler.logError("IO error during client saving to database: " + e.getMessage());
                     System.err.println("❌ An error occured during client saving");
                 }
-            }).start();
-            // notify adding state in the log file
+            } else {
+                new Thread(() -> {
+                    try{
+                        ClientFileHandler.addToDb(client);
+                    } catch (IOException e) {
+                        LogHandler.logError("IO error during client saving to database: " + e.getMessage());
+                        System.err.println("❌ An error occured during client saving");
+                    }
+                }).start();
+                // notify adding state in the log file
+            }
             LogHandler.logInfo("Client added" + client);
     }
 
@@ -64,14 +74,19 @@ public class ClientService {
             int id = client.getId();
             if (id == targetId) {
                 iterator.remove();
-                new Thread(() -> {
-                    try{
+                if (isTesting) {
                         ClientFileHandler.saveClients(clients);
-                    } catch (IOException e) {
-                        LogHandler.logError("IO error during client saving to database: " + e.getMessage());
-                        System.err.println("❌ An error occured during client saving");
-                    }
-                }).start();
+                } else {
+                    new Thread(() -> {
+                        try{
+                            ClientFileHandler.saveClients(clients);
+                        } catch (IOException e) {
+                            LogHandler.logError("IO error during client saving to database: " + e.getMessage());
+                            System.err.println("❌ An error occured during client saving");
+                        }
+                    }).start();
+                }
+
 
                 LogHandler.logInfo("Client deleted" + client);
                 return true;

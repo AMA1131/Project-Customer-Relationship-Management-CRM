@@ -47,7 +47,7 @@ public class InteractionHistoryFileHandler {
 
             if (interactionHistories == null) interactionHistories = new ArrayList<>();
         } catch (FileNotFoundException e) {
-            LogHandler.logWarning("File not found : " + e.getMessage());
+            LogHandler.logWarning("File not found while loading : " + e.getMessage());
             /*return  interactionHistories;*/
         }
 

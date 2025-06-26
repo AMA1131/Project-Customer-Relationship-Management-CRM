@@ -12,11 +12,10 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
         Path filePath = Paths.get("data/users.json");
-        String role;
         Scanner scan = new Scanner(System.in);
-        while (!Files.exists(filePath)) {
-            UserService userService = UserService.getUniqueInstance();
-            System.out.println("First connexion: Admin user Creation");
+        UserService userService = UserService.getUniqueInstance();
+        while (userService.getusers().isEmpty()) {
+            System.out.println("First User: Admin user Creation");
             try {
                 System.out.print("Firstname : ");
                 String firstName = scan.nextLine();
@@ -24,12 +23,7 @@ public class Main {
                 String lastName = scan.nextLine();
                 System.out.print("Email : ");
                 String email = scan.nextLine();
-                if (!Files.exists(filePath)) {
-                    role = "admin";
-                } else {
-                    System.out.print("Role (admin/user) : ");
-                    role = scan.nextLine();
-                }
+                String role = "admin";
                 System.out.print("Password : ");
                 String password = scan.nextLine();
 

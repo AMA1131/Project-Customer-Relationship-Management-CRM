@@ -2,6 +2,7 @@ package test;
 
 import model.composite_interaction.InteractionComponent;
 import model.composite_interaction.InteractionHistory;
+import service.ClientService;
 import service.InteractionHistoryService;
 import service.InteractionService;
 
@@ -11,6 +12,7 @@ import model.composite_interaction.Interaction;
 import utils.LogHandler;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -27,26 +29,43 @@ public class InteractionServiceTest {
     public void setup() {
         try {
             Files.deleteIfExists(historyPath);
-            Files.deleteIfExists(loggerPath);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+
+            Field instance = InteractionHistoryService.class.getDeclaredField("instance");
+            Field instance2 = InteractionService.class.getDeclaredField("uniqueInstance");
+            Field instance3 = ClientService.class.getDeclaredField("uniqueInstance");
+
+            instance.setAccessible(true);
+            instance2.setAccessible(true);
+            instance3.setAccessible(true);
+
+            instance.set(null, null);
+            instance2.set(null, null);
+            instance3.set(null, null);
+        } catch (IOException | NoSuchFieldException | IllegalAccessException e) {
+            LogHandler.logError("Error during test setup: " + e);
         }
+
+        InteractionService.isTesting = true;
+        InteractionHistoryService.isTesting = true;
+        ClientService.isTesting = true;
     }
 
     @Test
     public void testCreateInteraction() {
         try {
             InteractionHistoryService interactionHistoryService = InteractionHistoryService.getInstance();
+            LogHandler.logInfo("First");
             InteractionService interactionService = InteractionService.getUniqueInstance();
+
             interactionService.addInteractionToSubHistory("EMAIL", 1, 1, "Robot    Failing");
             interactionService.addInteractionToSubHistory("EM   AIL", 1, 1, "Robot    Failing");
             interactionService.addInteractionToSubHistory("Call", 1, 1, "Robot    Failing");
             interactionService.addInteractionToSubHistory("Cal  l", 1, 1, "Robot    Failing");
             interactionService.addInteractionToSubHistory("Mee Ting", 1, 1, "Robot    Failing");
-            interactionService.addInteractionToSubHistory("meeting", 1, 3, "Robot    Failing");
-            interactionService.addInteractionToSubHistory("Meet ing", 1, 3, "Robot    Failing");
-            interactionService.addInteractionToSubHistory("Ca l  l", 1, 3, "Robot    Failing");
-            interactionService.addInteractionToSubHistory("E mail", 1, 3, "Robot    Failing");
+            interactionService.addInteractionToSubHistory("meeting", 1, 2, "Robot    Failing");
+            interactionService.addInteractionToSubHistory("Meet ing", 1, 2, "Robot    Failing");
+            interactionService.addInteractionToSubHistory("Ca l  l", 1, 2, "Robot    Failing");
+            interactionService.addInteractionToSubHistory("E mail", 1, 2, "Robot    Failing");
 
             // GET ALL INTERACTIONS ADDED
             ArrayList<Interaction> interactions = interactionService.getInteractions();
@@ -67,7 +86,7 @@ public class InteractionServiceTest {
 
             // Get the list of subhistories of the client  3. the size must be 3 (meeting call & email
             ArrayList<InteractionComponent> components2 = interactionHistoryService
-                    .getInteractionshistoryById(3)
+                    .getInteractionshistoryById(2)
                     .getInteractions();
 
             ArrayList<InteractionHistory> subHistories2 = new ArrayList<>();
@@ -91,7 +110,7 @@ public class InteractionServiceTest {
             assertTrue(Files.exists(historyPath));
             // 2 histories must be in the json file 1 for each client 1 & 3
             assertTrue(interactionHistoryService.isexisting(1));
-            assertTrue(interactionHistoryService.isexisting(3));
+            assertTrue(interactionHistoryService.isexisting(2));
 
             // the size of history client 1 & 3 must be 3 for the three types of interactions
             assertEquals(3, subHistories1.size());
@@ -120,21 +139,23 @@ public class InteractionServiceTest {
     @Test
     public void testRemoveInteraction() {
         try{
+            LogHandler.logInfo("STARTS REMOVE PROCESS");
             InteractionService instance1 = InteractionService.getUniqueInstance();
+
             instance1.addInteractionToSubHistory("EMAIL", 1, 1, "Robot    Failing");
             instance1.addInteractionToSubHistory("EM   AIL", 1, 1, "Robot    Failing");
             instance1.addInteractionToSubHistory("Cal  l", 1, 1, "Robot    Failing");
             instance1.addInteractionToSubHistory("Mee Ting", 1, 1, "Robot    Failing");
             instance1.addInteractionToSubHistory("Call", 1, 1, "Robot    Failing");
-            instance1.addInteractionToSubHistory("meeting", 1, 3, "Robot    Failing");
-            instance1.addInteractionToSubHistory("Meet ing", 1, 3, "Robot    Failing");
-            instance1.addInteractionToSubHistory("Ca l  l", 1, 3, "Robot    Failing");
-            instance1.addInteractionToSubHistory("E mail", 1, 3, "Robot    Failing");
+            instance1.addInteractionToSubHistory("meeting", 1, 2, "Robot    Failing");
+            instance1.addInteractionToSubHistory("Meet ing", 1, 2, "Robot    Failing");
+            instance1.addInteractionToSubHistory("Ca l  l", 1, 2, "Robot    Failing");
+            instance1.addInteractionToSubHistory("E mail", 1, 2, "Robot    Failing");
 
-            int clientId = instance1.findClientFromInteraction(7);
-            String interactionType = instance1.getInteractionById(7).getType();
+            int clientId = instance1.findClientFromInteraction(12);
+            String interactionType = instance1.getInteractionById(12).getType();
 
-            instance1.removeInteraction(7);
+            instance1.removeInteraction(12);
 
             InteractionHistoryService instance2 = InteractionHistoryService.getInstance();
             ArrayList<InteractionComponent> subcomponents = instance2.getInteractionshistoryById(clientId).getInteractions();
