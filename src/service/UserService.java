@@ -2,6 +2,8 @@ package service;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.stream.Collectors;
+
 import factory.User;
 import model.GenerictIterator;
 import utils.ClientFileHandler;
@@ -112,12 +114,9 @@ public class UserService {
     }
 
     public ArrayList<model.User> findUserByName(String firstName) {
-        ArrayList<model.User> result = new ArrayList<>();
-        for(model.User user : users) {
-            if (user.getFirstName().equals(firstName.trim().toLowerCase().replaceAll("\\s+", " "))) {
-                result.add(user);
-            }
-        }
+        ArrayList<model.User> result = users.stream()
+                .filter(user -> user.getFirstName().equals(firstName.trim().toLowerCase()))
+                .collect(Collectors.toCollection(ArrayList::new));
 
         return result;
     }

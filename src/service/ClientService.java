@@ -2,6 +2,8 @@ package service;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.stream.Collectors;
+
 import factory.Client;
 import model.GenerictIterator;
 import utils.ClientFileHandler;
@@ -101,13 +103,9 @@ public class ClientService {
     }
 
     public ArrayList<model.Client> findClientByName(String firstName) {
-        ArrayList<model.Client> result = new ArrayList<>();
-        for(model.Client client : clients) {
-            if (client.getFirstName().equals(firstName.trim().toLowerCase())) {
-                result.add(client);
-            }
-        }
-
+        ArrayList<model.Client> result = clients.stream()
+                .filter(client -> client.getFirstName().equals(firstName.trim().toLowerCase()))
+                .collect(Collectors.toCollection(ArrayList::new));
         return result;
     }
 }

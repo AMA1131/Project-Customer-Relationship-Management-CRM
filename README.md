@@ -18,6 +18,8 @@ This project is about customer management.
 | Logging             | Custom Logger.java                             | To save precisely a record of technical errors and internal events      |
 | Multithreading      | Used during file updating (new Tread + lambda) | To save data asynchronously without blocking user experience            |
 | Lambda Expressions  | Runnable lambda for multithreading             | To support multithreading                                               |
+|                     | Reflection                                     | To access private variable during testing                               |
+| Design principles   | Stream API & lamda                             | To elaborate collections in a declarative way                           |
 
 ## ⚙️ Setup and Execution Instructions
 

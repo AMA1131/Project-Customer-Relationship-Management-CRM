@@ -3,6 +3,7 @@ package service;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 import factory.Interaction;
 import factory.InteractionHistory;
@@ -263,13 +264,11 @@ public class InteractionService {
     }
 
     public ArrayList<model.composite_interaction.Interaction> searchInteraction(String keyword){
-        ArrayList<model.composite_interaction.Interaction> result = new ArrayList<>();
         String sanitizedKeyword = keyword.trim().replaceAll("\\s+", " ").toLowerCase();
-        for (model.composite_interaction.Interaction i : interactions) {
-            if (i.getDescription().contains(sanitizedKeyword)) {
-                result.add(i);
-            }
-        }
+        ArrayList<model.composite_interaction.Interaction> result = interactions.stream()
+                .filter(interaction -> interaction.getDescription().contains(sanitizedKeyword))
+                .collect(Collectors.toCollection(ArrayList::new));
+
         return result;
     }
 }
